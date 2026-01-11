@@ -1,0 +1,108 @@
+Storyforge Default Drama Kit - Comics
+Version: v0.1 Date: 2026-01-08 Status: Canonical (Base Package)
+Purpose: Provide a default, comic-book-oriented set of relationship axes and goal vectors that reliably generates
+high-contrast drama without constraining genre-specific extensions.
+Precedence: Subordinate to workspace-law (Storyforge_Workspace_Canon_Rules_v0.1.txt) and higher canonical
+contracts. This kit never overrides explicit user-supplied SceneRequest or loaded Character Canon prohibitions.
+
+1. Scope and binding behavior
+This document defines default relationship axis vocabulary and default goal vector vocabulary for
+comic-book style scenes. It is a default kit: it applies only when required fields are missing, and it is
+designed to reduce flat scenes by forcing legible pressure, reversals, and costs.
+DK-001 (Default-Only): Use this kit only to fill missing relationship axes or character goals. If the user
+supplies them, obey the user.
+DK-002 (Extensible): Additional axes and goals may be added as free strings; this kit defines a stable
+core set, not a closed enum.
+DK-003 (No Canon Override): Diagnostic numbers (if used) are informational. They MUST NOT override
+explicit canon prohibitions or required behaviors.
+DK-004 (Auditability): If defaults are applied, you MUST record what you filled and why (see Section 5).
+
+2. Default Relationship Axis Set (Core 12)
+These 12 axis keys are the canonical default vocabulary for RelationshipEntry.conceptual_axes when a
+comic scene needs relationship pressure. Each axis is defined by two poles; scenes should indicate
+direction via before/after language and on-page signals.
+
+Key (string) | Poles | What it measures | Typical comic signals
+--- | --- | --- | ---
+dominance | dominance <-> submission | who can force outcomes now | orders, pins, humiliations
+leverage | leverage <-> exposure | who holds damaging info/advantage | threats, receipts, blackmail
+trust | trust <-> suspicion | belief in intentions/claims | tests, accusations, double-checking
+truth | truth <-> deception | how much is hidden/manipulated | lies, omissions, misdirection
+alignment | aligned <-> betrayal-risk | side-taking and loyalty stability | offers, defections, ultimatums
+closeness | closeness <-> distance | emotional access and vulnerability | confessions, shutouts
+desire | desire <-> disgust | magnetism (romantic/sexual/aesthetic) | flirt, recoil, temptation
+respect | respect <-> contempt | regard for competence/dignity | praise, belittling, contempt
+empathy | empathy <-> cruelty | willingness to spare vs harm | mercy, twisting the knife
+hatred | affection <-> hatred | raw valence (love-hate heat) | tenderness, venom, rage
+vengeance | mercy <-> vengeance | retribution pressure vs restraint | payback, restraint, bargains
+volatility | stability <-> volatility | likelihood of escalation/flip | impulses, snap turns
+
+DK-AX-010 (Primary/Secondary selection): For each scene, select 3 Primary axes and 2 Secondary
+axes from the Core 12. Primary axes MUST be referenced in planning and MUST visibly move in the
+rendered scene.
+DK-AX-020 (Reversal requirement): At least 1 Primary axis MUST reverse direction at or near the
+turning-point INU (e.g., suspicion->trust, mercy->vengeance, dominance->submission).
+DK-AX-030 (INU anchoring): Each Primary axis move MUST be represented by at least one INURecord
+with delta_type=relationship (or power when appropriate) and a perceptible_anchor that the renderer can
+show on-page.
+
+3. Default Goal Vector Set (Core 10)
+This kit defines a default vocabulary of character goal vectors, suitable for mapping into
+DriveEntry.drive_name when explicit goals are missing. These are forces, not tasks.
+
+Key (drive_name string) | What it means | Common comic collisions
+--- | --- | ---
+protect | keep a person/place/secret safe | duty vs desire; sacrifice
+gain_power | increase ability/influence/resources | envy, arms race, corruption
+keep_power | retain status/control; avoid dethroning | paranoia, purges, coercion
+uncover_truth | learn what happened; expose reality | secrets, betrayal, institutions
+hide_truth | keep identity/act/weakness concealed | lies vs intimacy; cover-ups
+win_love | start or restore a bond | triangles, rivals, fear of rejection
+keep_love | prevent abandonment; hold the bond | control vs trust; tests
+justice | punish wrongdoing / stop harm | ends vs means; moral injury
+revenge | make them pay; settle the score | escalation; collateral damage
+identity | become/accept the self; reject a role | mask vs self; destiny vs choice
+
+DK-GO-010 (Per-character minimum): If character goals are missing, assign each character at least two
+DriveEntries: one primary_goal (from Core 10) and one shadow_goal (also from Core 10, often in
+tension with the primary).
+DK-GO-020 (Goal collision): The scene Spine Conflict MUST be expressible as a collision between
+primary goals, constrained by the selected Primary axes.
+DK-GO-030 (Hidden intent): At least one character SHOULD pursue a goal that is not stated openly in
+dialogue (shadow goal), creating deception, leverage, or moral pressure.
+
+4. Default application protocol
+DK-AP-010 (When to apply): Apply this kit during Phase -1 (CanonInitializationPack) when relationship
+axes or character goal drives are required for planning/validation and not supplied by the user or existing
+canon.
+DK-AP-020 (How to apply):
+1) Identify the scene's likely spine conflict (from SceneRequest).
+2) Select 3 Primary axes + 2 Secondary axes from Core 12 that will best amplify that conflict.
+3) For each character, assign primary_goal + shadow_goal from Core 10 (DriveEntry.drive_name).
+4) Ensure at least one Primary axis can plausibly reverse by the turning point.
+5) Record defaults applied per Section 5.
+
+5. DefaultsAppliedReport (audit record)
+Core contracts do not define a dedicated DefaultsAppliedReport artifact. To keep the system stable, this kit
+defines a structured record that MUST be embedded in CanonInitializationPack.notes when defaults are
+applied.
+
+DK-AU-010 (Embedding): When defaults are applied, set CanonInitializationPack.notes to a string
+containing the JSON object below (exact keys).
+DefaultsAppliedReport (embedded in CanonInitializationPack.notes) { "kit_id":
+"Storyforge_Default_Drama_Kit_Comics", "kit_version": "v0.1", "applied_in_phase": "-1",
+"filled": { "relationship_axes": { "primary": ["string", "string", "string"],
+"secondary": ["string", "string"], "rationale": "string" }, "character_goals": [ {
+"character_id": "string", "primary_goal": "string", "shadow_goal": "string", "notes":
+null } ] }, "overrides_respected": ["string"] }
+
+DK-AU-020 (No silent drift): Do not revise previously recorded defaults inside the same scene window
+unless a ValidationReport RepairDirective explicitly permits Phase -1 changes.
+DK-AU-030 (Do not overwrite): If any field is present (user-supplied axes, drives, relationship baselines),
+do not overwrite it. Only fill missing items.
+
+6. Compatibility notes
+- This kit uses existing canonical fields: RelationshipEntry.conceptual_axes and
+CanonInitializationPack.drives (DriveEntry). It does not require schema changes.
+- Axis keys and goal keys are stable strings intended for consistent reuse across sessions and UI tooling.
+- Render-only repair (Phase PR) MUST NOT change selected axes, goals, spine conflict, or INURecords.

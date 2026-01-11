@@ -1,0 +1,105 @@
+STORYFORGE DESIGN CONVERGENCE CHARTER v0.1
+Status: Design-Only
+Scope: design_only
+Applies To: System evolution and architecture decisions
+
+============================================================
+1. PURPOSE
+============================================================
+
+This document defines the constructive direction toward which
+the Storyforge system must converge.
+
+It does NOT govern runtime behavior.
+It does NOT override the Kernel Contract.
+It must be ignored during SceneRuns.
+
+============================================================
+2. CORE GOAL
+============================================================
+
+Storyforge exists to reliably construct stories that exhibit:
+
+- clear turning points
+- perceptible meaning shifts
+- accumulating constraints across scenes
+- low narrative mush across runs
+
+The system is optimized for construction, not rejection.
+
+============================================================
+3. CONVERGENCE DEFINITION
+============================================================
+
+“Better stories” in Storyforge means:
+
+- Readers can identify where the story changed.
+- Meaning shifts are inferable from on-page evidence.
+- Each scene narrows future possibility space.
+- Structural clarity increases across iterations.
+
+No taste judgments are implied.
+
+============================================================
+4. CONVERGENCE LADDER (PRIORITY ORDER)
+============================================================
+
+When resolving ambiguity, prefer designs that:
+
+P1. Increase determinism and auditability
+P2. Increase structural clarity of turns and costs
+P3. Reduce LLM discretionary scheduling
+P4. Preserve creative freedom within structure
+P5. Minimize conceptual complexity
+
+Higher priorities override lower ones.
+
+============================================================
+5. CONSTRUCTIVE DESIGN LOOP
+============================================================
+
+All system changes must follow:
+
+1) Identify a recurring failure mode
+2) Define the structural objective
+3) Choose the smallest enforceable mechanism
+4) Add an audit hook
+5) Add a regression test
+
+============================================================
+6. BIAS TOWARD CONSTRUCTION
+============================================================
+
+When choosing between:
+- conservative safety
+- strong structural clarity
+
+Prefer clarity.
+
+The system should make bold, legible commitments.
+
+============================================================
+7. FIRST-CLASS CITIZEN BUDGET
+============================================================
+
+New first-class concepts are allowed only if they are:
+- deterministic
+- auditable
+- non-overlapping
+- phase-local
+
+Otherwise, downgrade to diagnostics or render hints.
+
+============================================================
+8. NON-INTERFERENCE RULE
+============================================================
+
+This document MUST NOT:
+- affect scene output
+- affect validation
+- affect rendering
+- be used as justification during execution
+
+============================================================
+END OF CONVERGENCE CHARTER
+============================================================

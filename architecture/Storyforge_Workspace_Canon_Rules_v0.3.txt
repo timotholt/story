@@ -1,0 +1,17 @@
+STORYFORGE WORKSPACE CANON RULES
+Version: v0.3
+Supersedes: v0.2
+
+CHANGE LOG
+- Enforces prompt boundary
+- Adds migration rule
+- Adds manifest requirement
+
+WC-PROMPT-010: System prompt MUST be kernel-only.
+WC-PROMPT-020: Narrative, diagnostic, or quality rules MUST NOT live in the prompt.
+
+WC-MIG-010: Any non-kernel behavior added to the prompt MUST be migrated into canonical docs next revision.
+
+WC-MAN-010: Workspace MUST include a Workspace Manifest declaring loaded docs and required artifacts.
+
+END STORYFORGE WORKSPACE CANON RULES v0.3

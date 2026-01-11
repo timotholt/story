@@ -1,0 +1,137 @@
+Storyforge Comics Default Presets Kit
+Version: v0.1 | Date: 2026-01-08
+
+Purpose: Provide small, comic-mode-friendly default presets that reduce flat scenes without changing
+any core engine schemas. This kit is defaults-only and never overrides user or higher-canon inputs.
+
+Scope: Applied only when output_mode = Comic and the user has not supplied the relevant details.
+Presets are referenced via tokens appended to existing string-list fields (e.g.,
+SceneRequestSpec.constraints / SceneContract.constraints) so no schema changes are required.
+
+Non-Override Rule: If the user specifies any of the preset topics (panel count, violence boundary,
+resistance quotas, etc.), those user values win. This kit only fills omissions.
+
+1. Canon Safety and Application Contract
+This document is a base package. It does not supersede workspace-law or core contracts. If any
+conflict exists, higher authority wins.
+• CPK-AP-010 (Defaults-only): Apply presets only for missing details and only when output_mode is
+Comic.
+• CPK-AP-020 (No schema changes): Record preset usage by appending tokens into existing string-list
+fields: SceneRequestSpec.constraints and/or SceneContract.constraints.
+• CPK-AP-030 (No silent drift): Do not revise applied preset choices inside the same scene window
+unless a ValidationReport RepairDirective explicitly permits a change.
+• CPK-AP-040 (Minimum footprint): Prefer the smallest preset that resolves the omission (do not
+over-specify).
+
+Preset Tokens: When a preset is applied, add tokens like the following:
+PRESET:ComicsDefaultsKit/v0.1:CPK-LS-010
+PRESET:ComicsDefaultsKit/v0.1:CPK-RP-020
+Tokens may be grouped as a comma-separated suffix in a single constraint string if list space is limited.
+
+2. Low-Stakes Scene Defaults (Comic Mode)
+Use these only when the user has not specified them and they are needed for clarity, staging, or
+pressure. These defaults should never change the scene's meaning.
+
+2.1 Time, Light, and Crowd
+• CPK-LS-010 (Time-of-day): Default to late afternoon or early evening if unspecified (best for readable
+light and crowd presence).
+• CPK-LS-020 (Lighting): Default to high-contrast readable lighting (clear silhouettes, readable eyes).
+• CPK-LS-030 (Crowd): Default to a small audience/witness set (3-12) unless privacy is required by the
+conflict.
+
+2.2 Comic-Standard Micro-Locations
+• CPK-LS-040 (Hero urban): rooftop edge, alley mouth, fire escape landing, subway platform,
+newsroom bullpen.
+• CPK-LS-050 (School): cafeteria line, hallway corner near lockers, gym bleachers, courtyard steps.
+• CPK-LS-060 (Authority): precinct hallway, interrogation room window, hospital corridor, lab bay.
+
+2.3 Default Props for Pressure and Legibility
+• CPK-LS-070: Evidence prop (photo, phone clip, envelope, torn note) when leverage/exposure is
+active.
+• CPK-LS-080: Constraint prop (broken strap, dead phone, cracked mask) when scarcity or vulnerability
+is active.
+• CPK-LS-090: Social prop (badge, clipboard, mic, camera) when status/authority is active.
+
+3. ResistancePlan Presets (Comic Pacing)
+These presets exist to prevent 'easy agreement' and to enforce visible back-and-forth before the hinge.
+They are compatible with the core rule: turning-point INU is forbidden until quotas are satisfied.
+
+3.1 Size Presets
+Preset ID | When to use | Minimum quotas before hinge | Notes
+--- | --- | --- | ---
+CPK-RP-010 (Small) | 1-page feel / short exchange | 2 blocks + 1 clamp | Clamp must impose a cost or a constraint shift
+CPK-RP-020 (Medium) | 2-3 page feel / standard scene | 3 blocks + 1 clamp + 1 cost spike | Cost spike must be visible in render.
+CPK-RP-030 (Large) | set-piece confrontation | 4 blocks + 2 clamps + 1 counterplay beat | Counterplay = opponent changes tactic after resistance
+
+3.2 Clamp Menu (choose at least one)
+• CPK-RP-110 (Witness clamp): someone is watching; stakes shift to reputation.
+• CPK-RP-120 (Time clamp): deadline compresses choices.
+• CPK-RP-130 (Resource clamp): loss of tool, phone, exit, mask, money, or cover story.
+• CPK-RP-140 (Moral clamp): to win, you must cross a line (or refuse and pay).
+
+4. Stakes and Cost Ladder (Comic Legibility)
+When resistance rises, cost should rise. This kit provides a default ladder that helps keep scenes from
+resolving cleanly. Use it as guidance; do not invent irreversible canon beyond what the core engine
+permits.
+
+4.1 Cost Levels
+• CPK-CL-010 (Social): embarrassment, credibility loss, public humiliation, rumor ignition.
+• CPK-CL-020 (Relational): trust fracture, boundary violation, withdrawal, allegiance wobble.
+• CPK-CL-030 (Tactical): lost leverage, exposed tell, trapped position, gave up advantage.
+• CPK-CL-040 (Physical): pain, fatigue, minor injury, damaged gear.
+• CPK-CL-050 (Moral): crossed a line, collateral harm, self-betrayal, stain that persists.
+
+CPK-CL-100 (Escalation rule): In Comic mode, default to a monotonic trend: each block should
+increase cost level or deepen the same cost in a new way until the hinge.
+
+5. Unexpected Turn (UT) Chooser for Comics
+UT is required by core contract. This section provides default heuristics for selecting UT types that read
+clearly on the page.
+
+5.1 Default UT-by-Scene-Type
+• CPK-UT-010 (Romance / intimacy): reveal or value_shift (secret identity pressure; misread motives).
+• CPK-UT-020 (Power play / rivalry): competence_shift or reversal (someone wins a beat the other
+assumed).
+• CPK-UT-030 (Mystery / investigation): reveal or constraint_snap (new evidence collapses a plan).
+• CPK-UT-040 (Team fracture): refusal or betrayal-risk spike (alignment axis snaps).
+• CPK-UT-050 (Hero vs villain): cost_spike or third_force only if pre-declared.
+
+CPK-UT-100 (Testability rule): UT must be falsifiable in planning and then perceptible in render (a
+reader can point to it).
+
+6. Comic Output Mode Grammar Defaults
+These defaults apply only to the rendering presentation (Phase 4). They may not change upstream
+meaning or state.
+
+6.1 Panels and Beat Rhythm
+• CPK-CG-010 (Panel count): Default to 5-8 panels for a single scene unless user requests otherwise.
+• CPK-CG-020 (Hinge spotlight): Give the turning-point INU its own panel (or a clear panel transition).
+• CPK-CG-030 (Reaction beat): After hinge, include at least one reaction panel that shows cost and
+constraint.
+
+6.2 Captions, Balloons, and SFX
+• CPK-CG-040: Captions are for framing or internal turn; balloons are for conflict. Do not over-caption.
+• CPK-CG-050: Use SFX sparingly (1-3 total) and only when it adds pressure or cost salience.
+
+6.3 Page-Turn Micro-Cliff (Optional)
+• CPK-CG-060: If the scene is long enough, end the penultimate panel with a question, threat, or
+reveal-beat that forces the next panel to answer it.
+
+7. Render Signals (Only When User Requests 'Punch' or Template)
+If the user requests tighter, punchier, more 'screenwriting-template' enforcement, apply these
+definitions for Comic mode. Otherwise, do not impose signal quotas beyond core requirements.
+
+7.1 Definitions
+• CPK-RS-010 (Button line): a short closing line that lands a beat (threat, vow, sting, promise).
+• CPK-RS-020 (Blade line): <= 10 words, cuts or exposes (insult, truth, ultimatum).
+• CPK-RS-030 (Reversal event): a clear flip in advantage, belief, or constraint (not mere mood).
+• CPK-RS-040 (Deflection humor): humor used to dodge pressure; must be punished by resistance if
+used.
+
+7.2 Default Minimal Quotas (only if triggered)
+• CPK-RS-110: button_lines_min = 2-4
+• CPK-RS-120: blade_lines_min = 2-4
+• CPK-RS-130: reversal_events_min = 1-2
+• CPK-RS-140: deflection_humor_min = 0-2
+
+END OF Storyforge_Comics_Default_Presets_Kit_v0.1

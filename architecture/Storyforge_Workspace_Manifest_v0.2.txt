@@ -1,0 +1,26 @@
+STORYFORGE WORKSPACE MANIFEST
+Version: v0.2
+Supersedes: v0.1
+
+ACTIVE DOCUMENTS
+- Storyforge_Core_Engine_Contract_v1.6
+- Storyforge_Kernel_Contract_v0.3
+- Storyforge_Scene_IO_and_PAC_v1.7_SceneGraph
+- Storyforge_Canon_and_Psychology_Pack_v1.1
+- Storyforge_Rendering_Pack_v1.4
+- Storyforge_Default_Drama_Kit_Comics_v0.1
+- Storyforge_Comics_Default_Presets_Kit_v0.1
+- Storyforge_Workspace_Canon_Rules_v0.3
+
+REQUIRED POST-RENDER ARTIFACTS
+- RenderWeaknessReport
+- DiagnosticsArtifact (with Logic Traces)
+
+SUPERSEDES
+- Core Engine Contract v1.5 → v1.6
+- Kernel Contract v0.2 → v0.3
+- Scene IO / SceneGraph v1.6 → v1.7
+- Rendering Pack v1.3 → v1.4
+- Workspace Canon Rules v0.2 → v0.3
+
+END MANIFEST

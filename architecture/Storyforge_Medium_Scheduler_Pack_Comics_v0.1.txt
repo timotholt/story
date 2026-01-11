@@ -1,0 +1,46 @@
+STORYFORGE MEDIUM SCHEDULER PACK — COMICS v0.1
+Status: Canonical (Execution Support)
+Scope: execution-support (comic-specific)
+
+============================================================
+1. PURPOSE
+============================================================
+
+Maps Emotional IR beats into comic panel slots.
+Placement only. No story invention.
+
+============================================================
+2. COMIC PAGE GRID
+============================================================
+
+Default grid: 5–7 panels
+
+Slots:
+SLOT-1 OPENING
+SLOT-2 CONTINUATION
+SLOT-3 CONTINUATION
+SLOT-H HINGE
+SLOT-R REACTION
+SLOT-E END-CAP
+
+============================================================
+3. BEAT → SLOT RULES
+============================================================
+
+INGRESS → SLOT-1 (+ SLOT-2 optional)
+UT → SLOT-H only
+COST → SLOT-H or SLOT-R
+SMD → SLOT-R or SLOT-E
+EXIT → SLOT-E
+
+============================================================
+4. HARD FAILURES
+============================================================
+
+- UT not isolated
+- ingress shares conflict slot
+- SMD absent by end
+
+============================================================
+END OF COMICS SCHEDULER
+============================================================

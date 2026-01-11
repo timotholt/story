@@ -1,0 +1,178 @@
+STORYFORGE KERNEL CONTRACT v0.3
+Status: Canonical (Execution Authority)
+Scope: execution
+Applies To: All SceneRuns (-2 → PR)
+Supersedes: v0.2
+
+============================================================
+1. PURPOSE
+============================================================
+
+This document defines the deterministic execution kernel for Storyforge.
+
+The Kernel is responsible for:
+- phase sequencing
+- context bundling
+- validation decisions
+- repair routing
+- state persistence
+
+The Kernel treats the LLM as a bounded generator of artifacts.
+The LLM is NOT an executor, scheduler, or decision authority.
+
+This contract must be implementable as real functional code.
+
+============================================================
+2. ROLE SEPARATION (HARD)
+============================================================
+
+2.1 Kernel (Deterministic)
+- Owns phase order
+- Owns state transitions
+- Owns validation outcomes
+- Owns repair operator selection
+- Owns document inclusion/exclusion
+
+2.2 Model (LLM)
+- Generates artifacts ONLY when requested
+- Generates ONLY the artifact type requested
+- Must obey provided schemas and constraints
+- May not advance phases
+- May not invent new artifacts
+- May not override validation outcomes
+
+2.3 Validator
+- Deterministic checks only
+- No taste, no creativity
+- Evaluates structure, traceability, and evidence
+
+============================================================
+3. PHASE EXECUTION MODEL
+============================================================
+
+Valid phase order (non-skippable):
+
+-2 Preconditions
+-1 Canon Initialization (optional)
+ 0 Discovery
+ 1 Planning
+ 2 Runtime
+2.5 Scene Meaning Integration
+ 3 Validation
+ 4 Rendering
+PR Post-Render Quality
+
+The Kernel MUST halt at each HARD GATE.
+
+============================================================
+4. CONTEXT BUNDLING (CRITICAL)
+============================================================
+
+For each phase, the Kernel assembles a ContextBundle containing:
+- Only artifacts required for that phase
+- Only documents whose scope applies to execution
+
+Documents with scope = design_only MUST be excluded.
+The LLM never sees the full workspace.
+
+============================================================
+5. TASK SPEC (MODEL CALL CONTRACT)
+============================================================
+
+Each model invocation MUST specify:
+- phase
+- artifact_type_required
+- schema_version
+- allowed_ops
+- forbidden_ops
+- context_bundle_reference
+
+The model must not infer missing tasks.
+
+============================================================
+6. VALIDATION OUTCOMES
+============================================================
+
+Validation results are one of:
+- VALID
+- REPAIRABLE
+- INVALID
+- NEEDS_INPUT
+
+The Kernel decides outcome.
+The model does not argue outcomes.
+
+============================================================
+7. REPAIR MODEL (OPERATOR-BASED)
+============================================================
+
+If REPAIRABLE:
+- Kernel issues RepairDirective
+- Directive specifies allowed_ops and forbidden_ops
+- Model applies ONLY allowed ops
+- Kernel re-validates
+
+No silent retries.
+Max two repair passes (unless Constraint Decay active).
+
+============================================================
+8. EXCLUSION RULE (HARD)
+============================================================
+
+Documents marked:
+Scope: design_only
+
+MUST NOT influence:
+- Scene generation
+- Validation
+- Rendering
+- Canon decisions
+
+If cited during a SceneRun, execution is INVALID.
+
+============================================================
+9. CONSTRAINT DECAY PROTOCOL (NEW v0.3)
+============================================================
+
+If the system enters a REPAIR LOOP:
+
+DEC-01 (Constraint Relaxation)
+If Validation returns REPAIRABLE for the 2nd time with error "UNSATISFIABLE":
+- The Kernel is authorized to reduce 'PressurePlan.cycles_min' by 1.
+- The Kernel is authorized to switch 'EnergyCurveSpec.validation_mode' from STRICT to SOFT.
+
+DEC-02 (Logging)
+- Any decay action MUST be logged in the DiagnosticsArtifact as separate "DecayEvent".
+
+============================================================
+KERNEL HARD RULES — EIR/MS (Context Wiring)
+============================================================
+
+K-EMO-01 (Require EmotionalBeatPlan)
+- Before entering Phase 3 (Rendering), the Kernel MUST verify that an EmotionalBeatPlan exists and is VALID.
+- If missing/invalid: STOP with HARD GATE failure.
+
+K-EMO-02 (Require MediumSchedule For Comic)
+- If output_mode = Comic, the Kernel MUST verify MediumSchedule exists and is VALID.
+
+K-EMO-03 (Enforce Beat/Slot Fidelity)
+- Rendering context MUST include the EmotionalBeatPlan + MediumSchedule.
+- Renderer is forbidden from inventing beats, changing beat order, or moving beats across slots.
+
+K-EMO-04 (Separate Context Bundles) [UPDATED v0.3]
+- Planning bundle MAY include drama kit and presets (as inputs).
+- Rendering bundle MUST include only:
+  • SceneRequestSpec (final)
+  • CanonInitializationPack (final)
+  • SceneContract (final)
+  • EmotionalBeatPlan (final)
+  • MediumSchedule (final, if applicable)
+  • MeaningArtifact (final)  <-- NEW REQUIRED INPUT
+  • INURecordSet (final)
+  • Render constraints
+  
+  Exclude design_only documents.
+
+============================================================
+END OF KERNEL CONTRACT
+============================================================

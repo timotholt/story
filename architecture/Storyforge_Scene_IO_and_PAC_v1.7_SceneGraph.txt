@@ -1,0 +1,473 @@
+STORYFORGE — SCENE IO AND PAC: SCENEGRAPH
+(INGRESS + PRESSURE DEPTH + EXECUTION CONTROL + SCENE IR / STORY BEATS + PATTERNS + ENERGY + LOGIC)
+Version: v1.7
+Status: Canonical (Consolidated)
+Date: 2026-01-10
+Supersedes: v1.6
+
+=================================================
+PURPOSE
+=================================================
+This document defines Storyforge Scene IO + PAC (SceneGraph) requirements.
+
+This version makes scene structure explicit and machine-checkable before any audience-facing rendering by
+introducing a REQUIRED SceneIR artifact containing story-beat node instances (“sceneBeats”) plus optional
+pattern constraints and an optional energy/tension curve spec.
+
+This document also formalizes:
+A) IngressPlan — how the audience enters the scene (reveal order and experiential pacing)
+B) PressurePlan — how pressure must cycle/escalate before the hinge (pre-hinge thickness)
+C) ExecutionControl — whether gates are interactive or auto, and how STOP gates behave
+D) Phase Output Envelopes — strict per-phase output-type constraints to prevent phase-smearing
+E) SceneIR / StoryBeats — structural scene trace required for validation and deterministic rendering
+F) BeatPatternSpec — pattern constraints over contiguous beat windows (“beat blocks” as overlays)
+G) EnergyCurveSpec — validate crescendo/crest/release across whole scene or a pattern window
+H) Render Mapping — rendered panels/blocks must reference beat IDs
+I) Logic & Meaning — justification traces for energy and pointers to meaning artifacts (NEW v1.7)
+
+=================================================
+SCOPE
+=================================================
+• Applies to all Storyforge scene runs that claim compliance with this Scene IO + PAC contract.
+• This is an IO and enforcement contract. It does not prescribe prose style; it prescribes structure,
+  legality, and phase correctness.
+
+=================================================
+AUTHORITY / INTENT
+=================================================
+• This document is intended to be consumed by a Storyforge controller and/or LLM execution prompt.
+• When conflicts exist, obey workspace authority order; however, this document is authoritative for
+  Scene IO schemas and the gates defined here.
+
+=================================================
+HARD CONSTRAINTS (NON-NEGOTIABLE)
+=================================================
+HC-01 (No Semantic Drift From Plans)
+• IngressPlan MUST NOT alter SMI / INUs / canon.
+• PressurePlan MUST NOT add plot requirements, reveals, or new characters; MUST NOT alter SMI / INUs / canon.
+
+HC-02 (ExecutionControl Obedience)
+• ExecutionControl MUST be obeyed.
+• Interactive runs MUST stop at STOP gates (no silent ACCEPT).
+• Auto runs MUST NOT request acceptance and MUST proceed deterministically.
+
+HC-03 (Phase Output Envelopes)
+• Rendering MUST occur only in Phase 4.
+• Phase PR MUST be DiagnosticsArtifact ONLY (counts + pass/fail + violations). No commentary.
+
+HC-04 (SceneIR Required)
+• SceneIR (including sceneBeats) is REQUIRED for a successful run.
+• If SceneIR is missing or invalid: FAIL.
+
+HC-05 (Render Mapping Required)
+• All rendered audience-facing blocks (panels/lines) MUST reference beat IDs (beat_refs).
+• If render mapping is missing or references unknown beats: FAIL.
+
+HC-06 (Logic Trace Required) [NEW v1.7]
+• All Energy assignments (tension/momentum) MUST include a 'justification' text citing specific observable actions.
+• If justification is missing or generic: FAIL.
+
+=================================================
+TERMS / DEFINITIONS
+=================================================
+• NodeType: A reusable schema/category in the SceneGraph vocabulary.
+• NodeInstance: A scene-local instantiation of a NodeType.
+• StoryBeat: A NodeInstance whose primary purpose is an audience-experienced narrative moment.
+• sceneBeats: The ordered list of StoryBeat instances produced in SceneIR (engine truth for the scene).
+• BeatPatternSpec: A constraint that must match a contiguous window of beats (an overlay “beat block”).
+• Energy: Numeric per-beat signals (tension, momentum) enabling structural validation of crescendos and releases.
+• Hinge: The turning beat of the scene. In this contract, “hinge” defaults to “choice under pressure,” not discovery.
+
+=================================================
+PHASE OUTPUT ENVELOPES (HARD)
+=================================================
+ENV-01 (No Audience Text Outside Phase 4)
+Only Phase 4 may contain audience-facing narrative text (e.g., "PANEL 1", screenplay blocks, prose lines).
+
+ENV-02 (PR Restricted Output)
+Phase PR MUST be DiagnosticsArtifact ONLY:
+• counts
+• pass/fail
+• violations (IDs)
+No additional paragraphs, suggestions, or commentary.
+
+ENV-03 (Phase Artifact Types)
+Each phase MUST output only its allowed artifact types:
+• Phase −2: DiagnosticsArtifact only
+• Phase −1: CanonArtifact + DiagnosticsArtifact only
+• Phase 0:  PlanArtifact + DiagnosticsArtifact only
+• Phase 1:  PlanArtifact + DiagnosticsArtifact only
+• Phase 2:  SceneIRArtifact + DiagnosticsArtifact only (NO PANELS)
+• Phase 2.5: MeaningArtifact + DiagnosticsArtifact only
+• Phase 3:  DiagnosticsArtifact only
+• Phase 4:  RenderedOutputToken ONLY (Comic Panels / Script blocks etc.)
+• Phase PR: DiagnosticsArtifact only
+
+Violation response (mandatory):
+If ENV-01 is violated even once, output:
+FAIL: ENV-01 (Rendered output outside Phase 4)
+and STOP.
+
+=================================================
+EXECUTION CONTROL
+=================================================
+ExecutionControl {
+  mode: "interactive" | "auto",
+  stop_at_hard_gates: boolean,
+  auto_accept_forbidden: boolean,
+  output_end_on_stop: boolean
+}
+
+Rules:
+EC-01 (Interactive)
+If mode="interactive" OR stop_at_hard_gates=true, the system MUST stop at each STOP gate and ask for ACCEPT.
+
+EC-02 (Auto)
+If mode="auto" AND stop_at_hard_gates=false, the system MUST proceed without requesting acceptance.
+The system MUST NOT invent ACCEPT decisions. It must simply continue.
+
+EC-03 (Forbidden Auto-Accept)
+If auto_accept_forbidden=true, the system MUST NOT print any “ACCEPTED” language. It must either:
+• ask user, or
+• continue silently (auto mode), depending on EC-01/EC-02.
+
+=================================================
+SCHEMA — INPUTS
+=================================================
+[Note: Context bundles dictate which inputs are visible. See Kernel Contract.]
+
+---------------------------------------------
+SceneRequestSpec (Input)
+---------------------------------------------
+SceneRequestSpec {
+  scene_id: string,
+  scene_purpose: string,
+  output_mode: string,
+
+  setting: { location: string, time: string },
+
+  characters: [
+    { character_id: string, display_name: string, role_hint?: string }
+  ],
+
+  relationship_baseline?: [
+    { from_id: string, to_id: string, baseline: string }
+  ],
+
+  stakes_focus?: string[],
+  constraints?: string[],
+
+  // Optional: if supplied, these MUST be validated and enforced
+  IngressPlan?: IngressPlan,
+  PressurePlan?: PressurePlan,
+  BeatPatternSpec?: BeatPatternSpec[],
+  EnergyCurveSpec?: EnergyCurveSpec,
+  ExecutionControl?: ExecutionControl
+}
+
+---------------------------------------------
+IngressPlan (Input)
+---------------------------------------------
+IngressPlan {
+  intent_statement: string,
+  reveal_curve: {
+    discovery_timing: number,
+    pressure_visibility: number,
+    audience_orientation: number,
+    mystery_vs_clarity: number
+  },
+  panel_targets: {
+    entry_panel: integer,
+    first_pressure_signal_panel: integer,
+    first_explicit_conflict_panel: integer,
+    first_true_topic_panel: integer,
+    hinge_panel: integer,
+    post_hinge_reaction_panel: integer
+  },
+  devices: { allowed: string[], required: string[], forbidden: string[] },
+  success_criteria: string[]
+}
+
+---------------------------------------------
+PressurePlan (Input)
+---------------------------------------------
+PressurePlan {
+  pre_hinge: {
+    cycles_min: integer,
+    beats_min: integer,
+    escalation_rule: "monotonic_cost_or_depth",
+    variation_required: boolean
+  },
+  tactics: {
+    allowed: string[],
+    required: string[],
+    forbidden_before_cycle: {
+      direct_accusation: integer,
+      endgame_language: integer,
+      ultimatum: integer
+    }
+  },
+  cost_targets: {
+    cost_spike_required: boolean,
+    cost_spike_by_cycle: integer,
+    allowed_cost_levels: string[]
+  },
+  hinge_guardrails: {
+    hinge_not_eligible_until_cycles_met: boolean,
+    hinge_not_eligible_until_beats_met: boolean
+  },
+  success_criteria: string[]
+}
+
+---------------------------------------------
+BeatPatternSpec (Input)
+---------------------------------------------
+BeatPatternSpec {
+  pattern_id: string,
+  scope: { range: "anywhere" | "pre_hinge" | "post_hinge", window: "contiguous" },
+  length: { beats_min: integer, beats_max: integer },
+  required_tags_all?: string[],
+  required_tags_any?: string[],
+  tactic_constraints?: { variation_required?: boolean, allowed?: string[], forbidden?: string[] },
+  structure_requirements?: {
+    reversals_min?: integer,
+    surprise_min?: integer,
+    failed_connection_min?: integer,
+    misinterpretation_min?: integer
+  },
+  beat_payload_requirements?: { must_have?: string[] },
+  energy_requirements?: {
+    require_escalation?: boolean,
+    crest_min_tension?: integer,
+    release_required?: boolean,
+    release_drop_min?: integer,
+    release_within_beats?: integer
+  }
+}
+
+---------------------------------------------
+EnergyCurveSpec (Input)
+---------------------------------------------
+EnergyCurveSpec {
+  curve_id: string,
+  scope: { apply_to: "whole_scene" | "pattern_id", pattern_id?: string },
+  targets: {
+    crescendo: {
+      required: boolean,
+      crest_min_tension: integer,
+      crest_position: "end" | "near_end" | "any"
+    },
+    release: {
+      required: boolean,
+      release_window_beats: integer,
+      min_drop_tension: integer
+    }
+  },
+  validation_mode: "strict" | "soft"
+}
+
+=================================================
+SCHEMA — REQUIRED OUTPUT ARTIFACT: SCENE IR
+=================================================
+
+---------------------------------------------
+SceneIR (Output; Phase 2)
+---------------------------------------------
+SceneIR {
+  scene_id: string,
+  output_mode: string,
+
+  scene_constraints: string[],
+
+  ingress_plan?: IngressPlan,
+  pressure_plan?: PressurePlan,
+
+  beat_patterns?: BeatPatternSpec[],
+  energy_curve_spec?: EnergyCurveSpec,
+
+  sceneBeats: StoryBeat[],              // REQUIRED
+  beat_counters: BeatCounters           // REQUIRED
+}
+
+---------------------------------------------
+StoryBeat (Output; Phase 2)
+---------------------------------------------
+StoryBeat {
+  beat_id: string,                      // unique within scene, e.g. "B01"
+  beat_index: integer,                  // 1..N, strictly increasing, no gaps
+  beat_type: "Ingress" | "Pressure" | "Hinge" | "Reaction" | "Button" | "Transition",
+
+  actor_id?: string,
+  target_id?: string,
+
+  intent?: string,
+  tactic?: string,
+
+  observable_action: string,            // short, renderable description
+
+  tags?: string[],
+
+  // NEW v1.7: Pointer to Phase 2.5 Meaning Artifact
+  meaning_ref?: {
+      meaning_id: string,
+      subtext_hint: string
+  },
+
+  cost: {
+    cost_type: "relational" | "moral" | "status" | "safety" | "none",
+    cost_delta: integer
+  },
+
+  energy: {
+    tension: integer,                   // REQUIRED range: 0..10
+    momentum: integer,                  // REQUIRED range: 0..10
+
+    // NEW v1.7: Logic Trace
+    justification: string               // REQUIRED.
+  },
+
+  reversal?: {
+    is_reversal: boolean,
+    kind?: "power_flip" | "topic_flip" | "emotional_flip" | "status_flip" | "expectation_flip"
+  },
+
+  surprise?: {
+    is_surprise: boolean,
+    kind?: "recontextualization" | "unexpected_softness" | "misread_intent" | "new_boundary" | "new_capability"
+  },
+
+  shot?: {
+    shot_type?: string,
+    subject?: string,
+    action?: string,
+    style_notes?: string
+  }
+}
+
+---------------------------------------------
+BeatCounters (Output; Phase 2)
+---------------------------------------------
+BeatCounters {
+  beats_total: integer,
+  hinge_beat_id?: string,
+  hinge_index?: integer,
+  pressure_beats_pre_hinge: integer,
+  cycles_pre_hinge: integer,
+  misdirection_present: boolean,
+  failed_connection_present: boolean,
+  misinterpretation_present: boolean,
+  reversals_total: integer,
+  surprise_total: integer,
+  crest_tension?: integer,
+  crest_beat_id?: string,
+  release_beat_id?: string,
+  release_tension?: integer
+}
+
+=================================================
+SCHEMA — RENDER OUTPUT + MAPPING (Phase 4)
+=================================================
+
+---------------------------------------------
+RenderedScene (Output; Phase 4)
+---------------------------------------------
+RenderedScene {
+  scene_id: string,
+  output_mode: string,
+  panels?: RenderedPanel[],
+  blocks?: RenderedBlock[]
+}
+
+RenderedPanel {
+  panel_id: string,
+  beat_refs: string[],        // REQUIRED
+  panel_text: string
+}
+
+RenderedBlock {
+  block_id: string,
+  beat_refs: string[],        // REQUIRED
+  block_text: string
+}
+
+=================================================
+VALIDATION GATES (UPDATED)
+=================================================
+All gate IDs below are HARD unless explicitly marked SOFT.
+
+---------------------------------------------
+BEAT-01 (SceneIR Required + Beat Integrity) [UPDATED v1.7]
+---------------------------------------------
+FAIL if:
+• SceneIR missing
+• sceneBeats missing or empty
+• beat_id not unique
+• beat_index not strictly 1..N with no gaps
+• energy.tension or energy.momentum missing or outside 0..10
+• energy.justification missing or empty string (NEW)
+
+---------------------------------------------
+LOGIC-01 (Tension Justification Check) [NEW v1.7]
+---------------------------------------------
+FAIL if:
+• Tension > 7 exists BUT justification does not cite a "High Stakes" entity (weapon, secret, violence, ultimatum).
+• This is a keyword-scan audit.
+
+---------------------------------------------
+BEAT-02 (Hinge Semantics + Eligibility)
+---------------------------------------------
+FAIL if:
+• no Hinge beat OR more than one Hinge beat
+• hinge occurs before PressurePlan thresholds
+  - cycles_pre_hinge < cycles_min
+  - pressure_beats_pre_hinge < beats_min
+
+---------------------------------------------
+BEAT-03 (Pressure Thickness + Required Tactics)
+---------------------------------------------
+If PressurePlan present:
+FAIL if:
+• cycles_pre_hinge < PressurePlan.pre_hinge.cycles_min
+• pressure_beats_pre_hinge < PressurePlan.pre_hinge.beats_min
+• required tactics missing as declared
+
+---------------------------------------------
+PATTERN-01 (BeatPatternSpec Satisfiable)
+---------------------------------------------
+If BeatPatternSpec present:
+FAIL if any pattern has no satisfying window.
+
+---------------------------------------------
+ENERGY-01 (Crescendo / Crest / Release)
+---------------------------------------------
+If EnergyCurveSpec present:
+• Apply check to scope.
+• Determine crest vs release.
+If validation_mode="strict": FAIL on violation.
+
+---------------------------------------------
+RMAP-01 (Render Mapping Integrity)
+---------------------------------------------
+FAIL if:
+• any RenderedPanel/RenderedBlock lacks beat_refs
+• any beat_ref does not exist in sceneBeats
+
+---------------------------------------------
+ENV-01 / ENV-02 / ENV-03 (Phase Envelopes)
+---------------------------------------------
+See Phase Output Envelopes section.
+
+=================================================
+DIAGNOSTICS ARTIFACT (SHARED FORMAT)
+=================================================
+DiagnosticsArtifact {
+  phase: string,
+  status: "PASS" | "FAIL" | "WARN",
+  triggered_gates: string[],
+  counts?: object,
+  violations?: { gate_id: string, detail: string }[]
+}
+
+=================================================
+END OF DOCUMENT
+=================================================

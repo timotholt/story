@@ -1,0 +1,44 @@
+STORYFORGE RENDERING PACK
+Version: v1.4
+Supersedes: v1.3
+
+CHANGE LOG
+- Adds RenderWeaknessReport (diagnostic-only)
+- Adds numerical scoring rubric
+- Adds automatic routing rules
+- No changes to rendering grammar or existing rules
+
+1. RENDER WEAKNESS REPORT (NEW)
+RP-RW-010: After Phase 4, emit RenderWeaknessReport.
+RP-RW-020: Report is diagnostic-only and canon-safe.
+
+Schema:
+RenderWeaknessReport {
+  total_score_0_100: int,
+  weakness_class: NONE | DELIVERY | MEANING,
+  recommended_route: POLISH_ONLY | MEANING_REPAIR,
+  subscores_0_10: {
+    axis_legibility,
+    turning_point_clarity,
+    resistance,
+    cost_escalation,
+    character_voice,
+    goal_pressure,
+    staging_clarity,
+    compression,
+    emotional_heat,
+    mode_grammar
+  },
+  weakest_factors: [ { factor, score, class, evidence, rule_refs } ]
+}
+
+2. ROUTING RULES
+RP-RW-200: DELIVERY ⇒ allow PR polish-only pass.
+RP-RW-210: MEANING ⇒ forbid PR; require upstream repair + validation.
+RP-RW-220: NONE ⇒ stop iteration.
+
+3. PR CONSTRAINT
+RP-PR-010: PR may only adjust presentation, clarity, compression, and staging emphasis.
+RP-PR-020: PR MUST NOT change meaning, INUs, canon, axes, goals, costs, or UT.
+
+END STORYFORGE RENDERING PACK v1.4

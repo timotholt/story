@@ -1,0 +1,71 @@
+STORYFORGE — VALIDATOR PSEUDOCODE (BEATS + PATTERNS + ENERGY + LOGIC)
+Version: v0.2
+Date: 2026-01-10
+Status: Working Notes (controller-targeted pseudocode)
+Supersedes: v0.1
+
+=================================================
+ASSUMPTIONS
+=================================================
+• Inputs have been parsed into in-memory objects matching Scene IO v1.7.
+• “FAIL” means the run must halt and report gate violations.
+
+=================================================
+GATE: BEAT-01 (SceneIR Required + Beat Integrity) [UPDATED v0.2]
+=================================================
+
+function gate_BEAT_01(SceneIR):
+  violations = []
+  beats = SceneIR.sceneBeats
+  
+  // ... [Previous Checks kept] ...
+
+    // energy required
+    if b.energy == null:
+      violations.append({gate_id:"BEAT-01", detail:"energy missing for beat " + b.beat_id})
+    else:
+      // NEW v0.2: Justification Check
+      if b.energy.justification == null or len(b.energy.justification) < 5:
+        violations.append({gate_id:"BEAT-01", detail:"energy.justification missing/short for beat " + b.beat_id})
+      
+      t = b.energy.tension
+      // ... [Range Checks kept] ...
+
+=================================================
+GATE: LOGIC-01 (Tension Justification Check) [NEW v0.2]
+=================================================
+
+function gate_LOGIC_01(SceneIR):
+  violations = []
+  beats = SceneIR.sceneBeats
+  
+  high_stakes_keywords = ["weapon", "gun", "knife", "blood", "kill", "die", "secret", "reveal", "trap", "betray"]
+
+  for b in beats:
+    if b.energy.tension > 7:
+        justification = lowercase(b.energy.justification)
+        found = false
+        for kw in high_stakes_keywords:
+            if kw in justification:
+                found = true
+                break
+        
+        if not found:
+             violations.append({gate_id:"LOGIC-01", detail:"High Tension (8+) without high stakes keyword in justification: " + b.beat_id})
+
+  if len(violations) > 0: return FAIL(violations)
+  return PASS()
+
+=================================================
+MAIN VALIDATION FLOW (Suggested) [UPDATED]
+=================================================
+
+function validate_scene(SceneIR, RenderedScene_or_null):
+  // Phase 2 gates
+  r1 = gate_BEAT_01(SceneIR); if r1.fail: return r1
+  
+  // NEW LOGIC GATE
+  r_logic = gate_LOGIC_01(SceneIR); if r_logic.fail: return r_logic
+
+  r2 = gate_BEAT_02(SceneIR); if r2.fail: return r2
+  // ... [Rest of flow] ...

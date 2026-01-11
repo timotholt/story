@@ -1,0 +1,130 @@
+Storyforge Canon and Psychology Pack
+Version: v1.1 • Date: 2026-01-08
+
+Canonical constraints for characters, relationships, drives/neglect, and epistemic/commitment models.
+Binds all phases and all output modes.
+
+Change summary (v1.0 → v1.1)
+- Expands CanonInitializationPack schemas (no “...” placeholders).
+- Clarifies: numeric scalars are diagnostics; they must not override canonical prohibitions.
+- No behavioral changes; this is a completeness + clarity update.
+
+1. Authority and scope
+This pack defines canonical constraints on characters, relationships, drives/neglect, and
+epistemic/commitment models. It binds Discovery, Planning, Runtime, SMI, Validation, and Rendering.
+
+Canon is immutable during a scene window. Do not use diagnostic scalars to override explicit canon
+prohibitions.
+
+2. Character canon (behavioral constraints)
+CharacterCanon binds what a character can plausibly do/say. Generic voice is invalid when
+CharacterCanon is present.
+
+2.1 CharacterCanon schema (minimum)
+CharacterCanon {
+ character_id: string,
+ display_name: string,
+ role_function: string|null,
+
+ voice_markers: [string...], # slang, cadence, tells, recurring moves
+ default_tactics: [string...],
+ taboos: [string...], # hard prohibitions
+ soft_limits: [string...], # "will do only if..."
+ vulnerabilities: [string...],
+
+ goals_near_term: [string...],
+ fears: [string...],
+ violence_boundary: enum(A,B,C),
+
+ notes: string|null
+}
+
+3. Relationship canon (axes + baseline)
+Relationships are represented as:
+- a baseline statement (what is true going into the scene),
+- conceptual axes vocabulary (qualitative),
+- optional numeric scalars (diagnostic only).
+
+3.1 RelationshipEntry schema
+RelationshipEntry {
+ from_id: string,
+ to_id: string,
+ baseline: string,
+ conceptual_axes: [string...], # e.g., ["power", "trust", "dependency"]
+ scalars: {
+ power: int|UNKNOWN, # 0–100 (diagnostic)
+ trust: int|UNKNOWN,
+ closeness: int|UNKNOWN,
+ volatility: int|UNKNOWN
+ },
+ notes: string|null
+}
+
+3.2 Suggested axis vocabulary (non-exhaustive)
+power / status / leverage
+trust / suspicion
+closeness / distance
+dependency / autonomy
+respect / contempt
+fear / safety
+volatility / stability
+obligation / resentment
+
+4. Drives and neglect (GCP)
+Drives create pressure; neglect creates brittleness. Drives and neglect are used to generate plausible
+pressure moves and costs.
+
+4.1 DriveEntry schema
+DriveEntry {
+ character_id: string,
+ drive_name: string,
+ drive_pressure: int|UNKNOWN, # diagnostic 0–100
+ neglect: int|UNKNOWN, # diagnostic 0–100
+ justification: string|null
+}
+
+5. Truth, belief, and evidence (epistemic model)
+Beliefs must be supported by in-scene evidence when they change. Truth-claims in a scene should be
+tracked as belief deltas (INURecords) rather than exposition.
+
+5.1 BeliefEvidenceEntry schema (optional)
+BeliefEvidenceEntry {
+ subject_id: string, # who holds the belief
+ proposition: string,
+ belief_strength: int|UNKNOWN, # diagnostic
+ evidence: [ { kind:string, anchor:string, note:string } ... ],
+ contradictions: [string...],
+ notes: string|null
+}
+
+6. Commitment under uncertainty (CUU)
+Commitments can be conditional, reluctant, or strategic. Commitment changes must be modeled as
+INUs (commitment delta_type) with visible cost when high.
+
+6.1 CommitmentEntry schema (optional)
+CommitmentEntry {
+ subject_id: string,
+ commitment: string,
+ strength: int|UNKNOWN,
+ conditions: [string...],
+ escape_hatches: [string...],
+ notes: string|null
+}
+
+7. CanonInitializationPack (scene_local) — complete schema
+CanonInitializationPack {
+ scope: "scene_local",
+ characters: [CharacterCanon...],
+ relationships: [RelationshipEntry...],
+ drives: [DriveEntry...],
+ epistemics: [BeliefEvidenceEntry...]|null,
+ commitments: [CommitmentEntry...]|null,
+ notes: string|null
+}
+
+8. Canon rules (hard)
+- Canon is immutable during a scene window.
+- Phase -1 may create minimal scene_local canon only when required.
+- Canon fields must be testable constraints, not analysis essays.
+- Avoid psychological labels in rendered output unless required by story world and permitted by output
+mode.

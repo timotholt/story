@@ -1,0 +1,32 @@
+STORYFORGE CORE ENGINE CONTRACT
+Version: v1.6
+Supersedes: v1.5
+
+CHANGE LOG
+- Introduces Prompt Kernel Contract
+- Introduces Post-Render Diagnostic Framework
+- Declares RenderWeaknessReport and Auto Routing invariants
+- No changes to scene generation semantics
+
+1. PROMPT KERNEL CONTRACT (NEW)
+CEC-PK-010: The system prompt is an execution kernel only.
+CEC-PK-020: The system prompt MUST NOT define narrative quality, prose rules, or diagnostics.
+CEC-PK-030: All behavioral rules MUST live in canonical documents with RuleIDs.
+CEC-PK-040: Any temporary prompt additions MUST be migrated into canonical documents next revision.
+
+2. POST-RENDER DIAGNOSTIC FRAMEWORK (NEW)
+CEC-RD-010: Canonical documents MAY define diagnostic artifacts evaluated after Rendering.
+CEC-RD-020: Diagnostics are informational and MUST NOT override canon prohibitions.
+CEC-RD-030: Diagnostics MAY recommend routing actions if explicitly permitted.
+
+3. AUTO INTENT ROUTING INVARIANT (NEW)
+CEC-AI-010: When a diagnostic artifact classifies weakness, routing MAY occur without user intent.
+CEC-AI-020: Routing classes are limited to POLISH_ONLY or MEANING_REPAIR.
+CEC-AI-030: POLISH_ONLY MUST NOT change meaning, canon, INUs, costs, or axes.
+CEC-AI-040: MEANING_REPAIR MUST re-run required upstream phases before rendering.
+
+4. COMPATIBILITY
+CEC-COMP-010: Existing scenes remain valid; diagnostics are additive.
+CEC-COMP-020: No existing schemas are modified by this contract.
+
+END STORYFORGE CORE ENGINE CONTRACT v1.6

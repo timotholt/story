@@ -1,0 +1,76 @@
+STORYFORGE RENDER PASS CONTRACT
+Version: v0.2
+Status: Canonical (Execution Support)
+Scope: execution-support (render governance)
+Applies To: Phase 4 (Rendering) and PR (Post-Render Quality)
+
+PURPOSE
+Centralize rendering governance so that:
+- Rendering is strictly downstream and non-semantic.
+- Rendering may improve delivery (clarity, compression, voice, staging) WITHOUT changing meaning.
+- Any attempt or pressure to introduce new meaning is detected and rejected deterministically.
+
+AUTHORITY & NON-CONFLICT
+- Subordinate to Storyforge_Workspace_Canon_Rules_v0.3.txt (workspace-law).
+- Compatible with Storyforge_Core_Engine_Contract_v1.6.
+- Does NOT redefine output-mode grammars or formatting schemas.
+- Where conflict exists, higher authority wins.
+
+DEFINITIONS
+Meaning includes any change to:
+- Facts, props, witnesses, locations, resources
+- Motives, secrets, reveals, causal links
+- INURecords, axes, goals, spine conflict, costs
+- Beat order, hinge placement, or RealityLedgerDelta
+
+Delivery includes:
+- Wording, cadence, clarity, compression
+- Staging emphasis of already-existing anchors
+- Removal of redundancy or filler
+- Voice differentiation without new facts
+
+HARD RULE
+Rendering MUST NOT change meaning.
+
+PASS ORDER (NON-SKIPPABLE)
+1. Meaning-Locked Draft Realization
+2. Voice & Rhythm (delivery only)
+3. Compression & Clarity (delivery only)
+4. Punch-Up & Staging Emphasis (delivery only)
+5. Output Conformance Check (format only)
+
+ALLOWED EDIT CLASSES
+- Syntax, diction, cadence
+- Paragraphing and line breaks
+- Removing redundancy
+- Clarifying speaker attribution already implied
+- Emphasizing existing resistance or cost
+
+FORBIDDEN EDIT CLASSES
+- Adding or altering facts, actions, or outcomes
+- Inventing beats or reordering beats
+- Changing axes, goals, or costs
+- Editing INUs or meaning deltas
+- Introducing new props, witnesses, or motives
+
+RENDER DRIFT GATE
+If new meaning is detected at any pass:
+- STOP immediately
+- Emit FAIL_RENDER_DRIFT
+- Emit SUGGESTIONS_FOR_UPSTREAM
+- Do NOT emit a best-effort render
+
+SUGGESTIONS_FOR_UPSTREAM
+When rendering requires missing ingredients, emit:
+- missing_ingredient
+- why_needed
+- safest_upstream_phase
+- suggested_artifact
+- risk_if_injected_in_render
+
+DIAGNOSTICS
+Rendering MAY compute diagnostics (redundancy, voice collision, exposition density,
+hinge spotlight clarity, staging clarity) for reporting only.
+Diagnostics MUST NOT override canon or permit meaning edits.
+
+END STORYFORGE RENDER PASS CONTRACT v0.2

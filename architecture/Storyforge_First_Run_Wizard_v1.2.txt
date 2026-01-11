@@ -1,0 +1,40 @@
+Storyforge First Run Wizard
+Version: v1.2
+Date: 2026-01-09
+Supersedes: v1.1
+
+PURPOSE
+Operator runbook for executing a governed Storyforge Scene.
+
+PHASE 1 CHECKLIST (PATCH)
+- Unexpected Turn defined
+- SaliencePlan (optional but recommended):
+  * Primary relationship axis selected
+  * One hot drive per character (max)
+  * One loud pressure source
+  * One spotlight rule
+
+SceneContract TEMPLATE (PATCH)
+SceneContract {
+  ...
+  unexpected_turn_plan: { ... },
+  salience_plan: {
+    primary_relationship_axis: string,
+    hot_drives: [
+      { character_id: string, drive_name: string }
+    ],
+    loud_pressure_source: enum(time, scarcity, risk, social, physical, moral),
+    spotlight_rule: string
+  },
+  render_signal_plan: RenderSignalPlan|null,
+  output_mode: enum(Comic, Prose, Screenplay)
+}
+
+PHASE 2 CHECKLIST (PATCH)
+- SalienceEvidence recorded if SaliencePlan present
+
+PHASE 3 CHECKLIST (PATCH)
+- Validate salience perceptibility if SaliencePlan exists
+
+NOTE
+Salience is a focus contract, not a creativity limiter.

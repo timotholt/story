@@ -1,0 +1,79 @@
+STORYFORGE EMOTIONAL IR & BEAT PLAN v0.1
+Status: Canonical (Execution Support)
+Scope: execution-support (medium-agnostic)
+
+============================================================
+1. PURPOSE
+============================================================
+
+This document defines the Emotional Intermediate Representation (Emotional IR)
+used by Storyforge to model audience-facing emotional flow independently of medium.
+
+The Emotional IR describes:
+- what the audience is allowed to believe
+- when that belief is violated
+- what cost is paid
+- what meaning becomes constrained
+
+It does NOT:
+- specify timing, panels, pages, or minutes
+- dictate rendering style
+- replace canon or user intent
+
+============================================================
+2. CORE PRINCIPLE
+============================================================
+
+Meaning precedes medium.
+
+The Emotional IR is invariant across render targets.
+Medium-specific scheduling maps Emotional IR beats into slots.
+
+============================================================
+3. EMOTIONAL BEAT TYPES (ORDERED)
+============================================================
+
+An EmotionalBeatPlan MUST be an ordered sequence.
+Minimum viable plan is 4 beats.
+
+Allowed beat types:
+
+1) INGRESS_EXPECTATION_LOCK
+2) MISDIRECTION_LOCK (optional)
+3) UNEXPECTED_TURN_VIOLATION
+4) COST_PAYMENT
+5) SMD_LOCK (Scene Meaning Delta)
+6) EXIT_RESIDUE
+
+============================================================
+4. INGRESS COMPLETION (OPERATIONAL)
+============================================================
+
+Ingress is COMPLETE only when:
+- the audience has time to form an expectation
+- no core conflict or revelation has occurred
+
+Ingress is enforced by forbidden actions, not captions.
+
+============================================================
+5. TRACEABILITY REQUIREMENTS
+============================================================
+
+Each beat MUST specify:
+- audience_belief_before
+- audience_belief_after
+- required_anchor_type
+
+============================================================
+6. FAILURE CONDITIONS
+============================================================
+
+An EmotionalBeatPlan is INVALID if:
+- conflict precedes ingress completion
+- UT does not violate a belief
+- cost is invisible
+- SMD does not constrain future possibility
+
+============================================================
+END OF EMOTIONAL IR
+============================================================
